@@ -26,6 +26,8 @@ if(nrow(articles) > 0) {
 
   
   resp <- sendMessage(msg, API_TOKEN, CHAT_ID)
+  content(resp)
+
   
   if(resp$status_code == 200) {
     urls_sent <- 
