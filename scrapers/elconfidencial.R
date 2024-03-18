@@ -1,7 +1,9 @@
+suppressWarnings(suppressMessages({
 library(dplyr)
 library(rvest)
 library(httr)
 library(DBI)
+}))
 
 HOMEPAGE <- "https://www.elconfidencial.com/economia/"
 N_HEADLINES <- 2

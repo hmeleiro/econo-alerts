@@ -1,7 +1,10 @@
+suppressWarnings(suppressMessages({
 library(dplyr)
 library(rvest)
 library(httr)
 library(DBI)
+}))
+
 
 HOMEPAGE <- "https://cincodias.elpais.com/"
 N_HEADLINES <- 3

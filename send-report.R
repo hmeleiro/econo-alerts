@@ -1,7 +1,11 @@
 library(DBI)
+library(dplyr)
+library(httr)
 
 API_TOKEN <- Sys.getenv("API_TOKEN")
 CHAT_ID <- Sys.getenv("CHAT_ID")
+
+source("functions.R", encoding = "UTF-8")
 
 con <- dbConnect(RSQLite::SQLite(), "econo-alerts-db.sqlite")
 

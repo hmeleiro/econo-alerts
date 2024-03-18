@@ -21,6 +21,6 @@ write2db <- function(out, media) {
 sendMessage <- function(msg, API_TOKEN, CHAT_ID, encode = "json") {
   url <- sprintf("https://api.telegram.org/bot%s/sendMessage", URLencode(API_TOKEN))
   payload <- sprintf("{\"text\":\"%s\",\"parse_mode\":\"Markdown\",\"disable_web_page_preview\":true,\"chat_id\":\"%s\"}", msg, CHAT_ID)
-  POST(url, body = payload, content_type("application/json"), accept("application/json"), encode = encode)
+  x <- POST(url, body = payload, content_type("application/json"), accept("application/json"), encode = encode)
 }
 

@@ -1,7 +1,9 @@
+suppressWarnings(suppressMessages({
 library(dplyr)
 library(rvest)
 library(httr)
 library(DBI)
+}))
 
 HOMEPAGE <- "https://www.publico.es/economia"
 N_HEADLINES <- 1
@@ -23,6 +25,5 @@ if(resp$status_code == 200) {
   out <- tibble(headline = headlines[1:N_HEADLINES], url = urls[1:N_HEADLINES])
 }
 
-out
 
 write2db(out, "Público")
