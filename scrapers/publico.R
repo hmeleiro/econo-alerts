@@ -18,7 +18,7 @@ if(resp$status_code == 200) {
   
   articles <- html %>% html_elements(".listing-item")
   
-  headlines <- articles %>% html_elements(".listing-title") %>% html_text(trim = T)
+  headlines <- articles %>% html_text(trim = T)
   urls <- articles %>% html_elements(".page-link") %>% html_attr("href")
   urls <- paste0("https://www.publico.es", urls)
   
