@@ -12,7 +12,7 @@ write2db <- function(out, media, article_type = "news") {
     q <- sprintf("INSERT OR IGNORE INTO articles (media, article_type, headline, url) VALUES %s", values)
     
     
-    dbExecute(con, q)
+    x <- dbExecute(con, q)
   }, finally = dbDisconnect(con))
   
   

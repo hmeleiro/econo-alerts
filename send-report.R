@@ -1,6 +1,9 @@
-library(DBI)
-library(dplyr)
-library(httr)
+suppressWarnings(suppressMessages({
+  library(dplyr)
+  library(DBI)
+  library(httr)
+}))
+
 
 API_TOKEN <- Sys.getenv("API_TOKEN")
 CHAT_ID <- Sys.getenv("CHAT_ID")
@@ -79,7 +82,7 @@ if(nrow(articles) > 0) {
     paste(collapse = "\n\n") %>% 
     paste0("<b>Madrid</b>\n\n", .)
   
-  title <- paste("🗞💸 Resumen prensa económica", format(Sys.Date(), "%d-%m-%Y"))
+  title <- paste("🗞💸 <b>Resumen prensa económica</b>", format(Sys.Date(), "%d-%m-%Y"))
   msg <- paste(title, msg_spain, msg_international, msg_opinion, msg_madrid, sep = "\n\n")
   
   if(nchar(msg) > 4096) {
@@ -87,13 +90,13 @@ if(nrow(articles) > 0) {
     msg2 <- paste0("\n\n", msg_international, "\n\n")
     msg3 <- paste(msg_opinion, msg_madrid, sep = "\n\n")
 
-    sendMessage(msg1, API_TOKEN, CHAT_ID)
+    resp <- sendMessage(msg1, API_TOKEN, CHAT_ID)
     Sys.sleep(.5)
-    sendMessage(msg2, API_TOKEN, CHAT_ID)
+    resp <- sendMessage(msg2, API_TOKEN, CHAT_ID)
     Sys.sleep(.5)
-    sendMessage(msg3, API_TOKEN, CHAT_ID)
+    resp <- sendMessage(msg3, API_TOKEN, CHAT_ID)
   } else {
-    sendMessage(msg, API_TOKEN, CHAT_ID)
+    resp <- sendMessage(msg, API_TOKEN, CHAT_ID)
   }
 
   if(resp$status_code == 200) {
