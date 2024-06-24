@@ -2,6 +2,7 @@ suppressWarnings(suppressMessages({
   library(dplyr)
   library(DBI)
   library(httr)
+  library(stringr)
 }))
 
 
@@ -17,7 +18,7 @@ articles <- dbGetQuery(con, q) %>%
   mutate(
     headline = gsub("\n", "", headline),
     headline = trimws(headline)
-  )
+  ) 
 
 if(nrow(articles) > 0) {
   
@@ -86,15 +87,28 @@ if(nrow(articles) > 0) {
   msg <- paste(title, msg_spain, msg_international, msg_opinion, msg_madrid, sep = "\n\n")
   
   if(nchar(msg) > 4096) {
-    msg1 <- paste(title, msg_spain, sep = "\n\n")
-    msg2 <- paste0("\n\n", msg_international, "\n\n")
-    msg3 <- paste(msg_opinion, msg_madrid, sep = "\n\n")
 
-    resp <- sendMessage(msg1, API_TOKEN, CHAT_ID)
-    Sys.sleep(.5)
-    resp <- sendMessage(msg2, API_TOKEN, CHAT_ID)
-    Sys.sleep(.5)
-    resp <- sendMessage(msg3, API_TOKEN, CHAT_ID)
+    msg_list <- str_split(msg, "\n\n")[[1]]
+    msg_short <- ""
+
+    while(length(msg_list) > 0) {
+
+      while (nchar(msg_short) < 4096 & length(msg_list) > 0) {
+        if(nchar(msg_short) + nchar(msg_list[1]) > 4096) {
+          break
+        }
+        msg_short <- paste0(msg_short, msg_list[1], "\n\n")
+        msg_list <- msg_list[-1]
+        }
+        resp <- sendMessage(msg_short, API_TOKEN, CHAT_ID)
+        if(resp$status_code != 200) {
+          break
+        }
+
+        msg_short <- ""
+        Sys.sleep(.5)
+    }
+
   } else {
     resp <- sendMessage(msg, API_TOKEN, CHAT_ID)
   }
