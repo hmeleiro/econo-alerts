@@ -1846,3 +1846,54 @@ Running scrapers/publico.R
 Running scrapers/ser-madrid.R
 Running scrapers/social-europe.R
 Running scrapers/voxeu.R
+Running scrapers/cincodias-opinion.R
+# Bootstrapping renv 1.0.5 ---------------------------------------------------
+- Downloading renv ... OK
+- Installing renv  ... OK
+
+- One or more packages recorded in the lockfile are not installed.
+- Use `renv::status()` for more details.
+Error in library(dplyr) : there is no package called ‘dplyr’
+Execution halted
+- One or more packages recorded in the lockfile are not installed.
+- Use `renv::status()` for more details.
+Error in library(dplyr) : there is no package called ‘dplyr’
+Execution halted
+Running scrapers/cincodias-opinion.R
+Running scrapers/cincodias.R
+Running scrapers/elconfidencial.R
+Running scrapers/eldiario-madrid.R
+Running scrapers/eldiario.R
+Running scrapers/elmundo-madrid.R
+Running scrapers/elmundo.R
+Running scrapers/elpais-madrid.R
+Running scrapers/elpais-opinion.R
+Running scrapers/elpais.R
+Running scrapers/expansion.R
+Running scrapers/financialtimes-opinion.R
+Running scrapers/financialtimes.R
+Running scrapers/infolibre.R
+Running scrapers/projectsyndicate.R
+Running scrapers/publico.R
+Running scrapers/ser-madrid.R
+Running scrapers/social-europe.R
+Running scrapers/voxeu.R
+Running scrapers/cincodias-opinion.R
+Running scrapers/cincodias.R
+Running scrapers/elconfidencial.R
+Running scrapers/eldiario-madrid.R
+Running scrapers/eldiario.R
+Running scrapers/elmundo-madrid.R
+Running scrapers/elmundo.R
+Running scrapers/elpais-madrid.R
+Running scrapers/elpais-opinion.R
+Running scrapers/elpais.R
+Running scrapers/expansion.R
+Running scrapers/financialtimes-opinion.R
+Running scrapers/financialtimes.R
+Running scrapers/infolibre.R
+Running scrapers/projectsyndicate.R
+Running scrapers/publico.R
+Running scrapers/ser-madrid.R
+Running scrapers/social-europe.R
+Running scrapers/voxeu.R
