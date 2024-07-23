@@ -29,13 +29,14 @@ first_n_words <- function(text, n = 100) {
   return(paste(words[1:n], collapse = " "))
 }
 
-reticulate::py_config()
-reticulate::py_available()
+# reticulate::py_config()
+# reticulate::py_available()
 
 source("functions.R", encoding = "UTF-8")
 
 con <- dbConnect(RSQLite::SQLite(), "econo-alerts-db.sqlite")
-q <- "SELECT * FROM articles WHERE article_type = 'Opinión' AND DATE(timestamp) = DATE('now') AND tagged = 0;"
+# q <- "SELECT * FROM articles WHERE article_type = 'Opinión' AND DATE(timestamp) = DATE('now') AND tagged = 0;"
+q <- "SELECT * FROM articles WHERE DATE(timestamp) = DATE('now') AND tagged = 0;"
 articles <- dbGetQuery(con, q) %>%
   mutate(
     headline = gsub("\n", "", headline),
@@ -45,15 +46,19 @@ articles <- dbGetQuery(con, q) %>%
   select(-c(economia, internacional, politica))
 dbDisconnect(con)
 
+
 # Scraping text from URL
 articles <-
   articles %>%
-  # slice_sample(n = 5) %>%
+  # slice_sample(n = 3) %>%
   mutate(
     text = map_chr(url, scrap_text),
     first_n_words = map_chr(text, first_n_words, n = 200)
   ) %>%
   filter(!is.na(text))
+
+
+
 
 
 if (nrow(articles) > 0) {
@@ -64,7 +69,7 @@ if (nrow(articles) > 0) {
   classifier <- transformers$pipeline(task = "zero-shot-classification", model = model)
 
 
-  candidate_labels <- c("economia", "politica", "internacional")
+  candidate_labels <- c("economia", "politica", "nacional", "internacional")
   system.time(
     outputs <- classifier(articles$first_n_words, candidate_labels, multi_label = TRUE)
   )
@@ -74,7 +79,7 @@ if (nrow(articles) > 0) {
     rename(first_n_words = sequence)
 
   articles_with_classes <- articles %>%
-    left_join(outputs) %>%
+    left_join(outputs, by = join_by(first_n_words)) %>%
     pivot_wider(names_from = "labels", values_from = "scores")
 
   for (i in 1:nrow(articles_with_classes)) {
@@ -82,16 +87,17 @@ if (nrow(articles) > 0) {
     url <- tmp$url
     economia <- round(tmp$economia, 4)
     politica <- round(tmp$politica, 4)
+    spain <- round(tmp$nacional, 4)
     internacional <- round(tmp$internacional, 4)
 
     con <- dbConnect(RSQLite::SQLite(), "econo-alerts-db.sqlite")
     tryCatch(
       {
         q <- sprintf(
-          "UPDATE articles SET economia = %s, politica = %s, internacional = %s, tagged = 1 where url = '%s'",
-          economia, politica, internacional, url
+          "UPDATE articles SET economia = %s, politica = %s, spain = %s, internacional = %s, tagged = 1 where url = '%s'",
+          economia, politica, spain, internacional, url
         )
-        dbExecute(con, q)
+        out <- dbExecute(con, q)
       },
       finally = dbDisconnect(con)
     )

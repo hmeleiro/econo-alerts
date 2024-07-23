@@ -13,7 +13,7 @@ source("functions.R", encoding = "UTF-8")
 
 con <- dbConnect(RSQLite::SQLite(), "econo-alerts-db.sqlite")
 
-q <- "SELECT * FROM articles WHERE sent = 1;"
+q <- "SELECT * FROM articles WHERE sent = 0;"
 articles <- dbGetQuery(con, q) %>%
   mutate(
     headline = gsub("\n", "", headline),
@@ -36,15 +36,17 @@ articles <- articles %>%
 if (nrow(articles) > 0) {
   spain <-
     articles %>%
-    filter(article_type == "news" & !grepl("Madrid", media) & media != "Financial Times")
+    filter(article_type == "news" & !grepl("Madrid", media) & !(media == "Financial Times" | (internacional >= .5 & spain < .2)))
+  # filter(article_type == "news" & !grepl("Madrid", media) & (media != "Financial Times" | (internacional >= .4 & internacional > spain)))
 
   international <-
     articles %>%
-    filter(article_type == "news" & media == "Financial Times")
+    filter(article_type == "news" & !grepl("Madrid", media) & (media == "Financial Times" | (internacional >= .5 & spain < .2)))
+  # filter(article_type == "news" & (media == "Financial Times" | (internacional >= .4 & internacional > spain)))
 
   opinion <-
     articles %>%
-    filter(article_type == "Opinión", economia >= .4 | media == "Financial Times")
+    filter(article_type == "Opinión", economia >= .45 | media == "Financial Times")
 
   madrid <-
     articles %>%
