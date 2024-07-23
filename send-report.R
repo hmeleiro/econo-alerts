@@ -13,12 +13,25 @@ source("functions.R", encoding = "UTF-8")
 
 con <- dbConnect(RSQLite::SQLite(), "econo-alerts-db.sqlite")
 
-q <- "SELECT * FROM articles WHERE sent = 0;"
+q <- "SELECT * FROM articles WHERE sent = 1;"
 articles <- dbGetQuery(con, q) %>%
   mutate(
     headline = gsub("\n", "", headline),
     headline = trimws(headline)
   )
+
+
+lvls_medios <- c(
+  "El País", "El Diario", "El Confidencial", "El Mundo", "Infolibre",
+  "Público", "Cinco Días", "Expansión", "El País (Madrid)", "El Diario (Madrid)",
+  "El Mundo (Madrid)", "Financial Times", "Project Syndicate", "Social Europe", "VoxEU"
+)
+
+articles <- articles %>%
+  filter(as.Date(timestamp) == Sys.Date()) %>%
+  mutate(media = factor(media, lvls_medios)) %>%
+  arrange(article_type, media)
+
 
 if (nrow(articles) > 0) {
   spain <-
@@ -31,7 +44,7 @@ if (nrow(articles) > 0) {
 
   opinion <-
     articles %>%
-    filter(article_type == "Opinión", economia >= .4)
+    filter(article_type == "Opinión", economia >= .4 | media == "Financial Times")
 
   madrid <-
     articles %>%
@@ -46,7 +59,7 @@ if (nrow(articles) > 0) {
       sprintf("%s\n%s", headline, url)
     }) %>%
     paste(collapse = "\n\n") %>%
-    paste0("<b>Nacional</b>\n\n", .)
+    paste0("<b>España</b>\n\n", .)
 
   msg_international <-
     purrr::map_chr(1:nrow(international), function(i) {
@@ -58,15 +71,18 @@ if (nrow(articles) > 0) {
     paste(collapse = "\n\n") %>%
     paste0("<b>Internacional</b>\n\n", .)
 
-  msg_opinion <-
-    purrr::map_chr(1:nrow(opinion), function(i) {
-      headline <- opinion[i, ]$headline
-      url <- opinion[i, ]$url
-      media <- opinion[i, ]$media
-      sprintf("%s\n%s", headline, url)
-    }) %>%
-    paste(collapse = "\n\n") %>%
-    paste0("<b>Opinión</b>\n\n", .)
+  if (nrow(opinion) > 0) {
+    msg_opinion <-
+      purrr::map_chr(1:nrow(opinion), function(i) {
+        headline <- opinion[i, ]$headline
+        url <- opinion[i, ]$url
+        media <- opinion[i, ]$media
+        sprintf("%s\n%s", headline, url)
+      }) %>%
+      paste(collapse = "\n\n") %>%
+      paste0("<b>Opinión</b>\n\n", .)
+  }
+
 
   msg_madrid <-
     purrr::map_chr(1:nrow(madrid), function(i) {
@@ -79,7 +95,11 @@ if (nrow(articles) > 0) {
     paste0("<b>Madrid</b>\n\n", .)
 
   title <- paste("🗞💸 <b>Resumen prensa económica</b>", format(Sys.Date(), "%d-%m-%Y"))
-  msg <- paste(title, msg_spain, msg_international, msg_opinion, msg_madrid, sep = "\n\n")
+  if (nrow(opinion) > 0) {
+    msg <- paste(title, msg_spain, msg_international, msg_opinion, msg_madrid, sep = "\n\n")
+  } else {
+    msg <- paste(title, msg_spain, msg_international, msg_madrid, sep = "\n\n")
+  }
 
   if (nchar(msg) > 4096) {
     msg_list <- str_split(msg, "\n\n")[[1]]

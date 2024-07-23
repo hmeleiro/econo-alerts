@@ -13,16 +13,20 @@ source("functions.R", encoding = "UTF-8")
 
 resp <- GET(HOMEPAGE)
 
-if(resp$status_code == 200) {
-  html <- resp %>% 
+if (resp$status_code == 200) {
+  html <- resp %>%
     read_html()
-  
+
   articles <- html %>% html_elements("article")
-  
-  headlines <- articles %>% html_elements("h2") %>% html_text()
-  urls <- articles %>% html_elements("a") %>% html_attr("href")
+
+  headlines <- articles %>%
+    html_elements("h2") %>%
+    html_text()
+  urls <- articles %>%
+    html_elements("a") %>%
+    html_attr("href")
   urls <- paste0("https://cadenaser.com", urls)
-  
+
   out <- tibble(headline = headlines[1:N_HEADLINES], url = urls[1:N_HEADLINES])
 }
 

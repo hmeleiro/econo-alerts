@@ -60,8 +60,6 @@ if (nrow(articles) > 0) {
   # # Importing 🤗 transformers into R session
   transformers <- reticulate::import("transformers")
   # # Instantiate a pipeline
-  # model <- "valhalla/distilbart-mnli-12-3"
-  # model <- "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
   model <- "MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli"
   classifier <- transformers$pipeline(task = "zero-shot-classification", model = model)
 
@@ -71,18 +69,13 @@ if (nrow(articles) > 0) {
     outputs <- classifier(articles$first_n_words, candidate_labels, multi_label = TRUE)
   )
 
-
   outputs <- outputs %>%
     map_df(as_tibble) %>%
     rename(first_n_words = sequence)
 
-
   articles_with_classes <- articles %>%
     left_join(outputs) %>%
     pivot_wider(names_from = "labels", values_from = "scores")
-
-
-  i <- 1
 
   for (i in 1:nrow(articles_with_classes)) {
     tmp <- articles_with_classes[i, ]
